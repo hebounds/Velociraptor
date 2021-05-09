@@ -9,6 +9,8 @@ errors = 0
 
 color_lasa_blue = 0x0c2340
 color_red = 0xe84b33
+color_green = 0x72e02d
+color_yellow = 0xffef42
 
 bot = commands.Bot(command_prefix="lasa ")
 
@@ -33,6 +35,52 @@ async def on_command_error(ctx, error):
         errors += 1
     print("========================================")
     raise error.original
+
+
+@bot.command(aliases=["notice", "event", "noticeboard", "notice-board", "announce", "announcement"])
+async def board(ctx, *title):
+    if ctx.guild.get_role(610536160338378765) in ctx.author.roles:
+        title = " ".join(title)
+        if title == "": title = "Announcement"
+        
+        box = discord.Embed(title="Create an Announcement", description="This announcement will show up in <#615257559976247300>. Use the :vibration_mode: reaction to mention @everyone when the announcement is sent.", color=color_lasa_blue)
+        box.add_field(name="Announcement Title", value=title, inline=False)
+        box.add_field(name="Content", value="The next message you send will be set as the description of this announcement. Press :stop_sign: to cancel.", inline=False)
+        bot_msg = await ctx.send(embed=box)
+        
+        mention = "📳"
+        cancel = "🛑"
+        await bot_msg.add_reaction(cancel)
+        await bot_msg.add_reaction(mention)
+        
+        description_msg = await bot.wait_for("message", check=lambda msg: msg.author == ctx.author and msg.channel == ctx.channel)
+        bot_msg = await ctx.channel.fetch_message(bot_msg.id) # There should probably be a discord.Message.fetch_reactions() method but this works too
+        
+        cancel_flag = False
+        important_flag = False
+        for r in bot_msg.reactions:
+            if str(r.emoji) == cancel:
+                users = await r.users().flatten()
+                if ctx.author in users:
+                    cancel_flag = True
+                    continue
+            elif str(r.emoji) == mention:
+                users = await r.users().flatten()
+                if ctx.author in users:
+                    important_flag = True
+                    continue
+        
+        if not cancel_flag:
+            box = discord.Embed(title=title, description=description_msg.content, color=color_lasa_blue)
+            box.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+            noticeboard = bot.get_channel(615257559976247300)
+            if important_flag:
+                await noticeboard.send("@everyone", embed=box)
+            else:
+                await noticeboard.send(embed=box)
+            await ctx.send(embed=discord.Embed(title="Announcement posted.", color=color_green))
+    else:
+        await ctx.send(embed=discord.Embed(title="Must be a staff member to post server announcements.", color=color_red))
 
 
 @bot.command(aliases=["bells"])
@@ -68,7 +116,7 @@ async def bell(ctx, version="today", *args):
         box.add_field(name="Period 2/6", value="10:40 am - 12:05 pm (85)", inline=False)
         box.add_field(name="Lunch", value="12:05 pm - 12:55 pm (50)", inline=False)
         box.add_field(name="Period 3/7", value="1:00 pm - 2:25 pm (85)", inline=False)
-        box.add_field(name="Period 3/7", value="2:30 pm - 3:55 pm (85)", inline=False)
+        box.add_field(name="Period 4/8", value="2:30 pm - 3:55 pm (85)", inline=False)
         if autoselect_flag: box.set_footer(text="Make sure to verify that this is the schedule being used!") # Schedule is autoselected by weekday, exceptions not taken into account
     
     elif version.lower() in ["reg", "norm", "regular", "normal", "nonadv", "non-adv", "nonadvisory", "non-advisory"]:
@@ -77,7 +125,7 @@ async def bell(ctx, version="today", *args):
         box.add_field(name="Period 2/6", value="9:55 am - 11:30 am (95)", inline=False)
         box.add_field(name="Lunch", value="11:35 am - 12:35 pm (60)", inline=False)
         box.add_field(name="Period 3/7", value="12:40 pm - 2:15 pm (95)", inline=False)
-        box.add_field(name="Period 3/7", value="2:20 pm - 3:55 pm (95)", inline=False)
+        box.add_field(name="Period 4/8", value="2:20 pm - 3:55 pm (95)", inline=False)
         if autoselect_flag: box.set_footer(text="Make sure to verify that this is the schedule being used!") # Same reason as above
     
     elif version.lower() in ["c", "cday", "c-day"]:
@@ -112,4 +160,4 @@ async def schedule(ctx, cmd, *args):
 
 # We probably don't want to run the bot if it's being imported in another program
 if __name__ == "__main__":
-    bot.run(os.getenv("TOKEN")) # Can be set using `export TOKEN="token"` on Linux
+    bot.run(os.getenv("TOKEN")) # details in the README
