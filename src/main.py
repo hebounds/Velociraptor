@@ -184,11 +184,11 @@ async def bell(ctx, version="today", *args):
 
     elif version.lower() in ["c", "cday", "c-day"]:
         # C day schedule (all 8 periods, never autoselected as it rarely happens)
-        box=discord.Embed(title="Bell Schedule - C Day", color=color_lasa_blue)
+        box = discord.Embed(title="Bell Schedule - C Day", color=color_lasa_blue)
         add_block_fields(box, bells_c_day)
 
     else:
-        box=discord.Embed(title="Unknown bell schedule.", color=color_red)
+        box = discord.Embed(title="Unknown bell schedule.", color=color_red)
 
     await ctx.send(embed=box)
 
@@ -200,7 +200,7 @@ async def schedule(ctx, cmd, *args):
     elif cmd.lower() in ["optin", "opt-in", "opt"]:
         pass  # TODO: Opt in the schedule function
     else:
-        box=discord.Embed(title="Unknown schedule function.", color=color_red)
+        box = discord.Embed(title="Unknown schedule function.", color=color_red)
         # TODO: Shift down a tab once above functions filled in
         await ctx.send(embed=box)
 
