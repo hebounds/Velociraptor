@@ -144,10 +144,13 @@ async def bell(ctx, version="today", *args):
         day_offset = 0
     
     autoselect_flag = False
-    if version.lower() in ["today", "now", "current"]:
+    if version.lower() in ["today", "now", "current"] or version.title() in calendar.day_name:
         # Autoselect a bell schedule according a normal week
-        autoselect_flag = True
-        day = (date.today().weekday() + day_offset) % 7
+        if version.title() in calendar.day_name:
+            day = list(calendar.day_name).index(version.title())
+        else:
+            day = (date.today().weekday() + day_offset) % 7
+            autoselect_flag = True
         if day in [5, 6]:
             # Saturday, Sunday
             box = discord.Embed(title="No bell schedule found for this day.", color=color_red)
