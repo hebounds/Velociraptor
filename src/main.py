@@ -55,6 +55,11 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     if not message.author.bot:
+        if len(message.attachments) > 0 or len(message.embeds) > 0:
+            await message.add_reaction("👍")
+            await message.add_reaction("👎")
+        if "admin abuse" in message.content.lower():
+            await message.channel.send("https://tenor.com/view/onyx-ttv-mr-fox-is-here-minecraft-server-gif-19583883")
         await bot.process_commands(message)
 
 
@@ -207,7 +212,9 @@ async def schedule(ctx, cmd, *args):
         # TODO: Shift down a tab once above functions filled in
         await ctx.send(embed=box)
 
-
 # We probably don't want to run the bot if it's being imported in another program
 if __name__ == "__main__":
-    bot.run(os.getenv("TOKEN"))  # TODO: explain in readme
+    bot_token = os.getenv("TOKEN")
+    if bot_token == None:
+        raise OSError("'TOKEN' environment variable is not set.")
+    bot.run(bot_token)  # TODO: explain in readme
