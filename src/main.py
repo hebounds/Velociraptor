@@ -212,6 +212,28 @@ async def schedule(ctx, cmd, *args):
         # TODO: Shift down a tab once above functions filled in
         await ctx.send(embed=box)
 
+#This is the code to do the mock command
+@commands.command(name='mock')
+async def mock(self, ctx, *, arg1=None):
+    messages = await ctx.channel.history(limit=2).flatten()
+    print(messages)
+    await ctx.message.delete()
+    contextMessage = messages[1]
+    messageMentions =contextMessage.mentions
+    print(messageMentions)
+    if arg1 == None:
+        counter = 0
+        newMessage = ''
+        mockMessage = messages[1].content.upper()
+        mockMessage = discord.utils.escape_mentions(mockMessage)
+        for i in mockMessage:
+            if counter == 0:
+                newMessage = newMessage+i.lower()
+                counter = 1
+            else:
+                newMessage = newMessage+i
+                counter = 0
+
 # We probably don't want to run the bot if it's being imported in another program
 if __name__ == "__main__":
     bot_token = os.getenv("TOKEN")
