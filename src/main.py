@@ -234,6 +234,14 @@ async def mock(ctx, *, arg1=None):
                 newMessage = newMessage+i
                 counter = 0
         await ctx.send(newMessage)
+        
+@bot.command()
+@commands.has_permissions(manage_messages=True)
+async def say(ctx, *, arg1):
+    await ctx.message.delete()
+    if arg1 is not None:
+        message1 = arg1
+        await ctx.send(message1)
 
 # We probably don't want to run the bot if it's being imported in another program
 if __name__ == "__main__":
