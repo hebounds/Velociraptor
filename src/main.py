@@ -233,7 +233,7 @@ async def mock(ctx, *, arg1=None):
             else:
                 newMessage = newMessage+i
                 counter = 0
-         await ctx.send(newMessage)
+        await ctx.send(newMessage)
 
 # We probably don't want to run the bot if it's being imported in another program
 if __name__ == "__main__":
