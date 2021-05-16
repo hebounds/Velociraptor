@@ -213,8 +213,8 @@ async def schedule(ctx, cmd, *args):
         await ctx.send(embed=box)
 
 #This is the code to do the mock command
-@commands.command(name='mock')
-async def mock(self, ctx, *, arg1=None):
+@bot.command()
+async def mock(ctx, *, arg1=None):
     messages = await ctx.channel.history(limit=2).flatten()
     print(messages)
     await ctx.message.delete()
@@ -233,6 +233,7 @@ async def mock(self, ctx, *, arg1=None):
             else:
                 newMessage = newMessage+i
                 counter = 0
+         await ctx.send(newMessage)
 
 # We probably don't want to run the bot if it's being imported in another program
 if __name__ == "__main__":
