@@ -2,6 +2,7 @@ import calendar
 import os
 from datetime import date
 
+import asyncio
 import discord
 from discord.ext import commands
 
@@ -55,22 +56,22 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     if not message.author.bot:
-        if len(message.attachments) > 0 or len(message.embeds) > 0:
+        await bot.process_commands(message)
+        await asyncio.sleep(0.5)
+        message = await message.channel.fetch_message(message.id)
+        if (len(message.attachments) > 0 or len(message.embeds) > 0) and message.channel.id == 615257900138496008:
             await message.add_reaction("👍")
             await message.add_reaction("👎")
-        if "admin abuse" in message.content.lower():
-            await message.channel.send("https://tenor.com/view/onyx-ttv-mr-fox-is-here-minecraft-server-gif-19583883")
-        await bot.process_commands(message)
 
 
-@bot.event
-async def on_command_error(ctx, error):
-    # We only want to tally errors outside the user input itself
-    if not isinstance(error, commands.errors.CommandInvokeError):
-        global errors
-        errors += 1
-    print("========================================")
-    raise error.original
+#@bot.event
+#async def on_command_error(ctx, error):
+#    # We only want to tally errors outside the user input itself
+#    if not isinstance(error, commands.errors.CommandInvokeError):
+#        global errors
+#        errors += 1
+#    print("========================================")
+#    raise error.original
 
 
 @bot.command(aliases=["notice", "event", "noticeboard", "notice-board", "announce", "announcement"])
@@ -78,7 +79,8 @@ async def board(ctx, *title):
     if ctx.guild.get_role(610536160338378765) in ctx.author.roles:
         # Invoker has Staff role, proceed
         title = " ".join(title)
-        if title == "": title = "Announcement"
+        if title == "":
+            title = "Announcement"
 
         box = discord.Embed(title="Create an Announcement",
                             description="This announcement will show up in <#615257559976247300>. Use the :vibration_mode: reaction to mention @everyone when the announcement is sent.", color=color_lasa_blue)
@@ -201,47 +203,47 @@ async def bell(ctx, version="today", *args):
     await ctx.send(embed=box)
 
 
-@bot.command(aliases=["schedules"])
-async def schedule(ctx, cmd, *args):
-    if cmd.lower() in ["optout", "opt-out"]:
-        pass  # TODO: Opt out of the schedule function
-    elif cmd.lower() in ["optin", "opt-in", "opt"]:
-        pass  # TODO: Opt in the schedule function
-    else:
-        box = discord.Embed(title="Unknown schedule function.", color=color_red)
-        # TODO: Shift down a tab once above functions filled in
-        await ctx.send(embed=box)
+#@bot.command(aliases=["schedules"])
+#async def schedule(ctx, cmd, *args):
+#    if cmd.lower() in ["optout", "opt-out"]:
+#        pass  # TODO: Opt out of the schedule function
+#    elif cmd.lower() in ["optin", "opt-in", "opt"]:
+#        pass  # TODO: Opt in the schedule function
+#    else:
+#        box = discord.Embed(title="Unknown schedule function.", color=color_red)
+#    await ctx.send(embed=box)
 
-#This is the code to do the mock command
-@bot.command()
-async def mock(ctx, *, arg1=None):
-    messages = await ctx.channel.history(limit=2).flatten()
-    print(messages)
-    await ctx.message.delete()
-    contextMessage = messages[1]
-    messageMentions =contextMessage.mentions
-    print(messageMentions)
-    if arg1 == None:
-        counter = 0
-        newMessage = ''
-        mockMessage = messages[1].content.upper()
-        mockMessage = discord.utils.escape_mentions(mockMessage)
-        for i in mockMessage:
-            if counter == 0:
-                newMessage = newMessage+i.lower()
-                counter = 1
-            else:
-                newMessage = newMessage+i
-                counter = 0
-        await ctx.send(newMessage)
-        
-@bot.command()
-@commands.has_permissions(manage_messages=True)
-async def say(ctx, *, arg1):
-    await ctx.message.delete()
-    if arg1 is not None:
-        message1 = arg1
-        await ctx.send(message1)
+
+@bot.command(aliases=["tilt"])
+async def mock(ctx, *, text=""):
+
+    def fix_mentions(text, msg):
+        # Make user and role mentions more readable (ignores @everyone and @here because it alternates the case anyway)
+        for user in msg.mentions:
+            escape = "@" + user.display_name
+            text = text.replace(f"<@{user.id}>", escape)
+            text = text.replace(f"<@!{user.id}>", escape)
+        for role in msg.role_mentions:
+            escape = "@" + role.name
+            text = text.replace(f"<@&{role.id}>", escape)
+        return text
+
+    if text.strip() == "":
+        source_msgs = await ctx.channel.history(limit=2).flatten()  # Grab second-to-last message in channel history
+        source_text = fix_mentions(source_msgs[1].content, source_msgs[1])
+        await ctx.message.delete()
+    else:
+        source_text = fix_mentions(text.strip(), ctx.message)
+    
+    result_text = ""
+    for i, char in enumerate(source_text):
+        # Even character index -> lowercase, odd character index -> uppercase (starting at 0)
+        if i % 2 == 0:
+            result_text += char.lower()
+        else:
+            result_text += char.upper()
+    await ctx.send(result_text)
+
 
 # We probably don't want to run the bot if it's being imported in another program
 if __name__ == "__main__":
