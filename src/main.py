@@ -136,7 +136,7 @@ async def bell(ctx, version="today", *args):
 
     def add_block_fields(embed: discord.Embed, blocks: list):
         for block in blocks:
-            embed.add_field(name=block[0], value=f"{block[1]} - {block[2]} ({block[3]})", inline=False)
+            embed.add_field(name=block[0], value=f"`{block[1]} - {block[2]} ({block[3]})`", inline=False)
 
     version += " ".join(args)
 
