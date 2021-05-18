@@ -251,7 +251,19 @@ async def say(ctx, *, arg1):
     if arg1 is not None:
         message1 = arg1
         await ctx.send(message1)
-        
+                
+@bot.command(name='ping', aliases=['pong', 'ping*'])
+async def ping(ctx):
+    t = await ctx.send('Pinging...')
+    ms = (t.created_at - ctx.message.created_at).total_seconds() * 1000
+    if ctx.invoked_with == 'ping':
+        pingPong = 'Pong'
+    else:
+        pingPong = 'Ping'
+
+    await t.edit(content=f':ping_pong: {pingPong}! `{int(ms)}ms`')
+    
+    
 # We probably don't want to run the bot if it's being imported in another program
 if __name__ == "__main__":
     bot_token = os.getenv("TOKEN")
