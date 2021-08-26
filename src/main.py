@@ -19,16 +19,16 @@ bells_advisory = [
     ["1/5",      "8:15 am", "9:40 am", "85"],
     ["Advisory", "9:45 am", "10:35 am", "50"],
     ["2/6",      "10:40 am", "12:05 pm", "85"],
-    ["Lunch",    "12:05 pm", "12:55 pm", "50"],
+    ["Lunch",    "12:05 pm", "1:00 pm", "55"],
     ["3/7",      "1:00 pm", "2:25 pm", "85"],
     ["4/8",      "2:30 pm", "3:55 pm", "85"]
 ]
 
 bells_non_advisory = [
     ["1/5",      "8:15 am", "9:50 am", "95"],
-    ["2/6",      "9:55 am", "11:30 am", "95"],
+    ["2/6",      "10:00 am", "11:35 am", "95"],
     ["Lunch",    "11:35 am", "12:35 pm", "60"],
-    ["3/7",      "12:40 pm", "2:15 pm", "95"],
+    ["3/7",      "12:45 pm", "2:10 pm", "95"],
     ["4/8",      "2:20 pm", "3:55 pm", "95"]
 ]
 
@@ -163,11 +163,11 @@ async def bell(ctx, version="today", *args):
             box = discord.Embed(title="No bell schedule found for this day.", color=color_red)
             await ctx.send(embed=box)
             return
-        elif day in [1, 2]:
+        elif day in [4]:
             # Tuesday, Wednesday
             version = "advisory"
         else:
-            # Monday, Thursday, (Friday)
+            # Monday, Tuesday, Wednesday, Thursday
             version = "non-advisory"
 
     if version.lower() in ["adv", "advisory"]:
