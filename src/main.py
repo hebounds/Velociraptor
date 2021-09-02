@@ -15,33 +15,47 @@ color_red = 0xe84b33
 color_green = 0x72e02d
 color_yellow = 0xffef42
 
+# [period, start, end, duration]
 bells_advisory = [
-    ["1/5",      "8:15 am", "9:40 am", "85"],
-    ["Advisory", "9:45 am", "10:35 am", "50"],
+    ["1/5",      "8:15 am",  "9:40 am",  "85"],
+    ["Advisory", "9:45 am",  "10:35 am", "50"],
     ["2/6",      "10:40 am", "12:05 pm", "85"],
-    ["Lunch",    "12:05 pm", "1:00 pm", "55"],
-    ["3/7",      "1:00 pm", "2:25 pm", "85"],
-    ["4/8",      "2:30 pm", "3:55 pm", "85"]
+    ["Lunch",    "12:05 pm", "1:00 pm",  "55"],
+    ["3/7",      "1:00 pm",  "2:25 pm",  "85"],
+    ["4/8",      "2:30 pm",  "3:55 pm",  "85"]
 ]
-
 bells_non_advisory = [
-    ["1/5",      "8:15 am", "9:50 am", "95"],
-    ["2/6",      "10:00 am", "11:35 am", "95"],
-    ["Lunch",    "11:35 am", "12:35 pm", "60"],
-    ["3/7",      "12:45 pm", "2:10 pm", "95"],
-    ["4/8",      "2:20 pm", "3:55 pm", "95"]
+    ["1/5",   "8:15 am",  "9:50 am",  "95"],
+    ["2/6",   "10:00 am", "11:35 am", "95"],
+    ["Lunch", "11:35 am", "12:35 pm", "60"],
+    ["3/7",   "12:45 pm", "2:10 pm",  "95"],
+    ["4/8",   "2:20 pm",  "3:55 pm",  "95"]
 ]
-
 bells_c_day = [
-    ["1",        "8:15 am", "9:00 am", "45"],
-    ["2",        "9:05 am", "9:50 am", "45"],
-    ["3",        "9:55 am", "10:40 am", "45"],
-    ["4",        "10:45 am", "11:30 am", "45"],
-    ["Lunch",    "11:35 am", "12:35 pm", "60"],
-    ["5",        "12:40 pm", "1:25 pm", "45"],
-    ["6",        "1:30 pm", "2:15 pm", "45"],
-    ["7",        "2:20 pm", "3:05 pm", "45"],
-    ["8",        "3:10 pm", "3:55 pm", "45"]
+    ["1",     "8:15 am",  "9:00 am",  "45"],
+    ["2",     "9:05 am",  "9:55 am",  "50"],
+    ["3",     "10:00 am", "10:45 am", "45"],
+    ["4",     "10:50 am", "11:35 am", "45"],
+    ["Lunch", "11:35 am", "12:35 pm", "60"],
+    ["5",     "12:35 pm", "1:20 pm",  "45"],
+    ["6",     "1:25 pm",  "2:10 pm",  "45"],
+    ["7",     "2:15 pm",  "3:00 pm",  "45"],
+    ["8",     "3:05 pm",  "3:55 pm",  "50"]
+]
+bells_delay = [
+    ["1/5",   "10:15 am", "11:25 am", "70"],
+    ["2/6",   "11:35 am", "12:45 pm", "70"],
+    ["Lunch", "12:45 pm", "1:25 pm",  "40"],
+    ["3/7",   "1:25 pm",  "2:35 pm",  "70"],
+    ["4/8",   "2:45 pm",  "3:55 pm",  "70"]
+]
+bells_pep_rally = [
+    ["1/5",       "8:15 am",  "9:35 am",  "80"],
+    ["2/6",       "9:45 am",  "11:05 am", "80"],
+    ["Lunch",     "11:05 am", "12:05 pm", "60"],
+    ["3/7",       "12:05 pm", "1:25 pm",  "80"],
+    ["4/8",       "1:35 pm",  "3:00 pm",  "85"],
+    ["Pep Rally", "3:00 pm",  "3:55 pm",  "55"]
 ]
 
 bot = commands.Bot(command_prefix="lasa ")
@@ -193,9 +207,19 @@ async def bell(ctx, version="today", *args):
             box.set_footer(text="Make sure to verify that this is the schedule being used!")
 
     elif version.lower() in ["c", "cday", "c-day"]:
-        # C day schedule (all 8 periods, never autoselected as it rarely happens)
+        # C day schedule (all 8 periods, never autoselected)
         box = discord.Embed(title="Bell Schedule - C Day", color=color_lasa_blue)
         add_block_fields(box, bells_c_day)
+    
+    elif version.lower() in ["pep", "rally", "peprally", "pep-rally", "pep rally"]:
+        # Pep rally schedule (pep rally at end of day, never autoselected)
+        box = discord.Embed(title="Bell Schedule - Pep Rally Day", color=color_lasa_blue)
+        add_block_fields(box, bells_pep_rally)
+    
+    elif version.lower() in ["delay", "late start", "latestart", "delayed", "2hr delay", "2hr-delay", "2 hour delay", "2-hour delay"]:
+        # Late start schedule (regular schedule squished to start 2 hours later, never autoselected)
+        box = discord.Embed(title="Bell Schedule - Late Start Day", color=color_lasa_blue)
+        add_block_fields(box, bells_delay)
 
     else:
         box = discord.Embed(title="Unknown bell schedule.", color=color_red)
